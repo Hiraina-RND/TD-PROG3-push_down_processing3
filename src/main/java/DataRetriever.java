@@ -66,4 +66,37 @@ public class DataRetriever {
         }
         return result;
     }
+
+    public List<DestinationAndDriverKmResult> getTotalKmByDestinationAndDriver() {
+        DBConnection dbConnection = new DBConnection();
+        String sql = """
+                select c.id as id_chauffeur, t.destination, SUM(t.nbre_km) as total_km
+                from chauffeur c
+                join vehicule v on v.id = c.id_vehicule
+                join trajet t on v.id = t.id_vehicule
+                group by c.id, t.destination
+                order by c.id
+                """;
+        List<DestinationAndDriverKmResult> resultList = new ArrayList<>();
+
+        try (
+                Connection connection = dbConnection.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ResultSet resultSet = ps.executeQuery()
+        ){
+            while(resultSet.next()) {
+                resultList.add(
+                        new DestinationAndDriverKmResult(
+                                resultSet.getInt("id_chauffeur"),
+                                resultSet.getString("destination"),
+                                resultSet.getDouble("total_km")
+                        )
+                );
+            }
+
+        } catch (SQLException e){
+            throw new RuntimeException("Error executing query", e);
+        }
+        return resultList;
+    }
 }

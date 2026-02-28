@@ -4,5 +4,7 @@ public class Main {
         System.out.println(dataRetriever.getTotalKmByVehicle());
         System.out.println("===================");
         System.out.println(dataRetriever.getTotalKmByDestination());
+        System.out.println("===================");
+        System.out.println(dataRetriever.getTotalKmByDestinationAndDriver());
     }
 }
