@@ -40,4 +40,30 @@ public class DataRetriever {
         }
         return resultList;
     }
+
+    public DestinationKmResult getTotalKmByDestination() {
+        DBConnection dbConnection = new DBConnection();
+        String sql = """
+                select SUM(case when t.destination = 'ANTANANARIVO' then t.nbre_km end) as antananarivo_total_km,
+                       SUM(case when t.destination = 'AMPEFY' then t.nbre_km end) as ampefy_total_km,
+                       SUM(case when t.destination = 'ANDASIBE' then t.nbre_km end) as andasibe_total_km
+                from trajet t
+                """;
+        DestinationKmResult result = new DestinationKmResult();
+
+        try(
+                Connection connection = dbConnection.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ResultSet resultSet = ps.executeQuery()
+        ) {
+            if(resultSet.next()) {
+                result.setAntananarivoTotalKm(resultSet.getDouble("antananarivo_total_km"));
+                result.setAmpefyTotalKm(resultSet.getDouble("ampefy_total_km"));
+                result.setAndasibeTotalKm(resultSet.getDouble("andasibe_total_km"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error executing query", e);
+        }
+        return result;
+    }
 }
